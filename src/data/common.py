@@ -2,22 +2,19 @@
 
 Paths, subject/fold utilities, and the official 4-fold evaluation protocol.
 Reuses the processed dataset (stimulus features + metadata) produced by
-src/preprocess.py.
+src/scripts/preprocess.py. Shared constants live in src/config.py (re-exported
+here so existing import sites keep working).
 """
 import hashlib
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-PROCESSED = ROOT / "processed_dataset"
-RAW = ROOT / "original_dataset" / "EMS"
-OUTPUTS = ROOT / "outputs"
-
-NUM_STIMULI = 100
-NUM_FEATURES = 45
-SCREEN_W, SCREEN_H = 1024.0, 768.0
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # EMS-Projects/src
+from config import (ROOT, PROCESSED, RAW, OUTPUTS,  # noqa: E402
+                    NUM_STIMULI, NUM_FEATURES, SCREEN_W, SCREEN_H)
 
 
 def load_metadata():

@@ -38,7 +38,7 @@ def short_run(experiment, fold, seed, epochs=2, read_fold=None):
     """Run the mlp_deepset config for `epochs` epochs; return metrics.jsonl rows
     with the wall-clock field `elapsed_s` stripped (run-specific metadata,
     not a scientific result)."""
-    cmd = [PY, "src/proposal/train.py", "--experiment", experiment,
+    cmd = [PY, "src/scripts/train_proposal.py", "--experiment", experiment,
            "--ablation", "mlp_deepset", "--comparator", "mlp",
            "--pool", "deepset", "--fold", fold, "--seed", str(seed),
            "--epochs", str(epochs), "--feature_set", "full45"]
@@ -87,13 +87,12 @@ def main():
 
     # 4. CLI seed reaches sklearn estimators
     sys.path.insert(0, str(ROOT / "src"))
-    sys.path.insert(0, str(ROOT / "src" / "baseline"))
-    from baseline.features_builder import build_agg  # noqa: E402
-    from baseline.models import make_ml_pipeline  # noqa: E402
-    from baseline.protocols import protocol1_folds, load_metadata  # noqa: E402
+    from features.subject import build_agg  # noqa: E402
+    from models.baselines import make_ml_pipeline  # noqa: E402
+    from data.common import official_folds, load_metadata  # noqa: E402
     import numpy as np
 
-    fold_name, train_ids, val_ids = next(iter(protocol1_folds()))
+    fold_name, train_ids, val_ids = next(iter(official_folds()))
     X = build_agg(sorted(train_ids + val_ids))
     meta = load_metadata()
     Xtr = X.loc[sorted(train_ids)].values

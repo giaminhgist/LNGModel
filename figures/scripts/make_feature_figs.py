@@ -4,7 +4,7 @@ Statistical unit: SUBJECT-level aggregation of each feature over valid
 stimuli (mean), n=80 per group — never individual fixations or
 subject-stimulus pairs treated as independent.
 
-Implementation notes honored here (see src/features.py):
+Implementation notes honored here (see src/features/stimulus.py):
   - tem_ifi_* = mean of (dur_i + dur_{i+1})/2 (onset timestamps unavailable)
   - tem_velocity_mean = saccade amplitude / that IFI proxy (px/ms) — NOT a
     measured saccade velocity

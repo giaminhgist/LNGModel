@@ -24,6 +24,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (FIG, TAB, CAT_COLORS, HC_COLOR, SZ_COLOR, savefig,  # noqa: E402
                     panel_label, load_metadata, image_list, category_of,
                     PROCESSED, RAW)
+# figures/scripts/common.py pushed src/ onto sys.path[0]; keep this directory
+# first so `rawdata` resolves to figures/scripts/rawdata.py, not src/rawdata.py
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rawdata import load_cleaned, load_drop_log, labels_series  # noqa: E402
 
 IMG_ROOT = RAW / "Images"

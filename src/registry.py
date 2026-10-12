@@ -22,7 +22,7 @@ and same seeds for every experiment. Checkpoint policy (development
 comparison): best outer-validation AUC epoch, earliest epoch wins ties; the
 ACC/SEN/SPEC/F1 reported are taken at that same checkpoint.
 """
-from trainer.config import PROTOCOL_VERSION
+from training.config import PROTOCOL_VERSION
 
 # Locked BEFORE any result was inspected. Do not add/remove/swap seeds based
 # on scores.

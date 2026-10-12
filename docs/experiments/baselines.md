@@ -1,14 +1,14 @@
 # Baselines — classical ML and FNN (10 methods)
 
-Code: `src/baseline/` (representations in `features_builder.py`, estimators
-in `models.py`, protocol in `protocols.py`), matrix config in
-`src/registry.py::BASELINE_METHODS`. Per-run artifacts:
+Code: representations in `src/features/subject.py`, estimators in
+`src/models/baselines.py`, protocol in `src/data/common.py::official_folds`,
+matrix config in `src/registry.py::BASELINE_METHODS`. Per-run artifacts:
 `outputs/experiments/<method>/seed<seed>/fold<fold>/`.
 
 ## Representations (subject level)
 
 The 45 features are per (subject, stimulus). Baselines aggregate them into
-one vector per subject (see `EDA/README.md` Section 6):
+one vector per subject (see `src/features/subject.py`):
 
 | representation | dim | definition |
 |---|---|---|

@@ -1,13 +1,13 @@
 """Cached access to raw + cleaned fixations for the dataset figures.
 
 Loads every subject's fixation xlsx once, applies the SAME cleaning rules as
-src/preprocess.py::clean_fixations, and caches the cleaned long-format table
-as pickle under figures/cache/.
+src/scripts/preprocess.py::clean_fixations, and caches the cleaned long-format
+table as pickle under figures/cache/.
 
-The cleaning function is inlined (identical rules to src/preprocess.py:
-DUR_MIN 40, DUR_MAX 2000, pupil ±4 SD within stimulus, screen bounds
-1024x768) to avoid the `common` module-name collision between
-figures/scripts/common.py and src/common.py inside the preprocess import.
+The cleaning function is inlined (identical rules to
+src/scripts/preprocess.py: DUR_MIN 40, DUR_MAX 2000, pupil ±4 SD within
+stimulus, screen bounds 1024x768) to avoid the module-name collision between
+figures/scripts/rawdata.py and src/rawdata.py inside the preprocess import.
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ DROP_PQ = CACHE / "fixations_drop_log.pkl"
 
 
 def _clean_fixations(df: pd.DataFrame):
-    """Mirror of src/preprocess.py::clean_fixations (see module docstring)."""
+    """Mirror of src/scripts/preprocess.py::clean_fixations (see module docstring)."""
     SCREEN_W, SCREEN_H = 1024.0, 768.0
     before = len(df)
     df = df[(df.FIX_X >= 0) & (df.FIX_X < SCREEN_W)

@@ -2,14 +2,14 @@
 
 Reference for the 45-feature stimulus representation used by every
 experiment in this repository. Authoritative implementation:
-`src/features.py::compute_stimulus_features` (single source of truth; this
+`src/features/stimulus.py::compute_stimulus_features` (single source of truth; this
 document mirrors it).
 
 ## Computation context
 
 - Computed **per (subject, stimulus)** from the *cleaned* fixations of that
   stimulus, ordered by `FIX_INDEX` (cleaning rules:
-  `src/preprocess.py::clean_fixations`).
+  `src/scripts/preprocess.py::clean_fixations`).
 - Input arrays: `x, y` — fixation coordinates in **pixels** (screen
   1024 × 768, Eyelink display); `dur` — fixation duration in **ms**;
   `pup` — pupil size in **Eyelink arbitrary units**.
@@ -105,7 +105,7 @@ Notation: `cx = 512, cy = 384` (screen center), `w = 1024, h = 768`.
 Steps between consecutive fixations: `dx = diff(x)`, `dy = diff(y)`,
 `amp = sqrt(dx² + dy²)`. These treat each consecutive-fixation transition as
 an (inferred) saccade — the EMS release does not contain explicit saccade
-events (see `roman_features/README.md` for the same convention).
+events.
 
 | feature | formula (code) | NaN when | behavioral / clinical interpretation |
 |---|---|---|---|

@@ -44,8 +44,8 @@ sys.path.insert(0, str(REPO / "src"))
 from data.common import (load_metadata, official_folds,  # noqa: E402
                          load_stimulus_features, image_list)
 
-# src/common.py shares the name `common` -> load under an explicit alias
-_spec = importlib.util.spec_from_file_location("src_common", REPO / "src" / "common.py")
+# src/rawdata.py would collide with figures/scripts/rawdata.py -> explicit alias
+_spec = importlib.util.spec_from_file_location("src_common", REPO / "src" / "rawdata.py")
 src_common = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(src_common)
 
@@ -183,7 +183,7 @@ def pick_run_dir(ablation, seed, fold):
 # --------------------------------------------------------------------- #
 import torch  # noqa: E402
 
-from proposal.model import NormativeModel, NormativeDataset  # noqa: E402
+from models.proposal import NormativeModel, NormativeDataset  # noqa: E402
 
 
 def load_checkpoint_model(ablation, seed, fold, device="cpu"):
@@ -219,7 +219,7 @@ def make_datasets(ablation, seed, fold, stim_subset=None):
 
 
 # --------------------------------------------------------------------- #
-# Feature groups (src/features.py order; verified identical to
+# Feature groups (src/features/stimulus.py order; verified identical to
 # processed_dataset/feature_names.txt)
 # --------------------------------------------------------------------- #
 FEATURE_GROUPS = {

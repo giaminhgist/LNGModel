@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 from data.common import official_folds, load_feature_names, labels_of  # noqa: E402
 from data.tabular import hc_normative_stats, feature_norm_stats  # noqa: E402
-from proposal.model import NormativeModel, NormativeDataset  # noqa: E402
+from models.proposal import NormativeModel, NormativeDataset  # noqa: E402
 from metrics import compute_metrics  # noqa: E402
 from seeding import seed_all  # noqa: E402
 
@@ -74,7 +74,7 @@ def main():
 
     # 5. checkpoint restore reproduces predictions (2-epoch mini run)
     import subprocess
-    subprocess.run([sys.executable, "src/proposal/train.py",
+    subprocess.run([sys.executable, "src/scripts/train_proposal.py",
                     "--experiment", "CORRECTCHECK", "--ablation", "mlp_deepset",
                     "--comparator", "mlp", "--pool", "deepset",
                     "--fold", fold_name, "--seed", "5", "--epochs", "2",
@@ -103,7 +103,7 @@ def main():
           np.allclose(np.array(ckpt["val_probs"]), np.array(probs)))
 
     # 6. batch-1 BatchNorm path (FNN eval with a single subject)
-    from baseline.models import BasicFNN
+    from models.baselines import BasicFNN
     seed_all(0)
     fnn = BasicFNN(in_dim=91).eval()
     with torch.no_grad():
@@ -112,9 +112,9 @@ def main():
           torch.isfinite(p).all())
 
     # 7. classical seed threading (svm_rbf differs, gnb identical)
-    from baseline.features_builder import build_agg
-    from baseline.models import make_ml_pipeline
-    from baseline.protocols import load_metadata
+    from features.subject import build_agg
+    from models.baselines import make_ml_pipeline
+    from data.common import load_metadata
     X = build_agg(sorted(train_ids + val_ids))
     meta = load_metadata()
     Xtr = X.loc[sorted(train_ids)].values

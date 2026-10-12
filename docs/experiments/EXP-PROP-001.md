@@ -7,8 +7,8 @@ train-fold HC encodings) is recomputed every epoch; a learned comparator
 produces per-stimulus deviation d; a set-level pool aggregates the 100
 deviations into one subject embedding; an MLP head classifies HC/SZ.
 
-Code: `src/proposal/model.py` (`NormativeModel`, `NormativeDataset`),
-training in `src/proposal/train.py` + `src/trainer/trainer.py`.
+Code: `src/models/proposal.py` (`NormativeModel`, `NormativeDataset`),
+training in `src/scripts/train_proposal.py` + `src/training/trainer.py`.
 Artifacts: `outputs/experiments/EXP-PROP-001/full45/seed<seed>/`.
 
 ## Architecture (input dim 45)

@@ -1,8 +1,8 @@
 """Helper: print the sha256 of a freshly-seeded model's initial parameters.
 
 Used by check_seed.py to compare initializations across processes. Replicates
-the exact construction path of src/proposal/train.py: seed_all(seed) THEN
-model construction, same dataset/stats code path.
+the exact construction path of src/scripts/train_proposal.py: seed_all(seed)
+THEN model construction, same dataset/stats code path.
 """
 import argparse
 import hashlib
@@ -13,7 +13,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # EMS-Projects/src
 from seeding import seed_all  # noqa: E402
-from proposal.model import NormativeModel  # noqa: E402
+from models.proposal import NormativeModel  # noqa: E402
 from data.common import load_feature_names  # noqa: E402
 
 

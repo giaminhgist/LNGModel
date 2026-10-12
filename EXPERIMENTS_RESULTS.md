@@ -1,6 +1,6 @@
 # EXPERIMENTS_RESULTS — EMS-Projects (10 seeds, official 4-fold)
 
-Generated 2026-09-23 from `outputs/experiments/` by `src/summarize_experiments.py`.
+Generated 2026-09-23 from `outputs/experiments/` by `src/scripts/summarize_experiments.py`.
 
 ## Protocol (brief)
 

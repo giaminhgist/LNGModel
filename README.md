@@ -14,11 +14,8 @@ reaches **AUC 0.9403 ± 0.0156** (validation), above all 10 baselines and
 the published MSNet reference (AUC 0.8972).
 
 - **Results**: [`EXPERIMENTS_RESULTS.md`](EXPERIMENTS_RESULTS.md)
-- **Documentation**: [`docs/`](docs/README.md) — methodology and results of
+- **Documentation**: [`docs/`](docs/) — methodology and results of
   every experiment + the full 45-feature reference
-- **Isolated feature ablation**: [`roman_features/`](roman_features/SUMMARY.md)
-  — direction-frequency and ambient/focal K-index features (separate,
-  self-contained experiment system)
 
 ## Table of contents
 
@@ -49,6 +46,7 @@ the published MSNet reference (AUC 0.8972).
   Details: [`docs/experiments/baselines.md`](docs/experiments/baselines.md).
 - **Ablations**: EXP-PROP-002…005 isolate pooling (mean / attention / max)
   and the deviation mechanism (fixed hard z-deviation).
+  Details: [`docs/experiments/ablations.md`](docs/experiments/ablations.md).
 - **Protocol**: official subject-level 4-fold (Set_0..Set_3, 120 train /
   40 val per fold), 10 locked seeds `[1234, 100, 0, 2024, 42, 3, 123, 13,
   64, 2026]`, best checkpoint = highest outer-validation AUC (earliest
@@ -66,7 +64,7 @@ benchmark:
   validation metrics).
 - Fixation tables per subject: `IMAGE, FIX_INDEX, FIX_DURATION, FIX_X,
   FIX_Y, FIX_PUPIL` on a 1024×768 display.
-- Cleaning (`src/preprocess.py::clean_fixations`): drop off-screen
+- Cleaning (`src/scripts/preprocess.py::clean_fixations`): drop off-screen
   fixations, keep duration in (40, 2000] ms, drop per-stimulus pupil
   outliers (±4 SD of the stimulus median); stimuli with < 2 clean
   fixations are missing (masked rows).
@@ -76,7 +74,7 @@ benchmark:
 ## 3. The 45 hand-crafted features
 
 One 45-dim vector per (subject, stimulus), computed from cleaned fixations
-ordered by `FIX_INDEX` (`src/features.py`):
+ordered by `FIX_INDEX` (`src/features/stimulus.py`):
 
 | group | count | examples |
 |---|---|---|
@@ -137,7 +135,7 @@ and both FNN baselines sit above the published MSNet validation AUC.
 ## 6. Ablation studies
 
 Each ablation changes exactly one component of the main proposal
-(details: `docs/experiments/EXP-PROP-00X.md`):
+(details: `docs/experiments/ablations.md`):
 
 | EXP | Component changed | AUC | ACC | SEN | SPEC | F1 | ΔAUC vs main (pp) |
 |---|---|---|---|---|---|---|---|
@@ -154,77 +152,66 @@ learned deviation pipeline adds substantial value over raw feature-space
 z-scores (−3.30 pp when removed). Development numbers over the same 10
 seeds/folds — not significance tests.
 
-**Isolated feature ablation** ([`roman_features/`](roman_features/SUMMARY.md)):
-two additional hand-crafted feature groups (inferred-saccade direction
-frequencies, ambient/focal K-index) evaluated as a factorial ablation over
-EXP-PROP-001 on all 10 seeds. Result (retained, negative): neither group
-adds predictive value (paired per-seed ΔAUC −0.99 … −2.16 pp); the
-reproduced A0 reference matched the original suite exactly for all 10
-seeds.
-
 ## 7. Reproducing all experiments
 
 ```bash
 uv sync                     # Python ≥ 3.12 (see pyproject.toml)
 
 # 0. data preparation (raw EMS must be in original_dataset/EMS/)
-python src/preprocess.py
+python src/scripts/preprocess.py
 
 # 1. one proposal run (4 official folds, one seed)
-python src/proposal/train.py --experiment EXP-PROP-001 --ablation mlp_deepset \
+python src/scripts/train_proposal.py --experiment EXP-PROP-001 --ablation mlp_deepset \
     --comparator mlp --pool deepset --fold all --seed 42
-python src/proposal/train.py --experiment EXP-PROP-002 --ablation mlp_mean \
+python src/scripts/train_proposal.py --experiment EXP-PROP-002 --ablation mlp_mean \
     --comparator mlp --pool mean --fold all --seed 42
-python src/proposal/train.py --experiment EXP-PROP-003 --ablation mlp_attn \
+python src/scripts/train_proposal.py --experiment EXP-PROP-003 --ablation mlp_attn \
     --comparator mlp --pool attention --fold all --seed 42
-python src/proposal/train.py --experiment EXP-PROP-004 --ablation z_mean \
+python src/scripts/train_proposal.py --experiment EXP-PROP-004 --ablation z_mean \
     --deviation z --pool mean --fold all --seed 42
-python src/proposal/train.py --experiment EXP-PROP-005 --ablation mlp_max \
+python src/scripts/train_proposal.py --experiment EXP-PROP-005 --ablation mlp_max \
     --comparator mlp --pool max --fold all --seed 42
 
 # 2. one baseline
-python src/baseline/run_experiment.py --method svm_rbf --seed 42
+python src/scripts/run_baseline.py --method svm_rbf --seed 42
 
 # 3. full 10-seed matrix (5 proposal + 10 baselines, official 4-fold;
 #    single-threaded BLAS env is set by the runner)
-python src/run_experiments.py --workers 8
+python src/scripts/run_experiments.py --workers 8
 
 # 4. aggregation + reports (outputs/experiments/*.csv, EXPERIMENTS_RESULTS.md)
-python src/summarize_experiments.py
+python src/scripts/summarize_experiments.py
 
 # 5. seed/correctness checks
 python src/checks/check_seed.py
 python src/checks/check_correctness.py
-
-# 6. isolated roman_features/ ablation (independent system, see its README)
-python roman_features/tests/run_tests.py
-python roman_features/code/build_cache.py
-python roman_features/code/run_seed_sweep.py --workers 7
-python roman_features/code/summarize.py
 ```
 
 Notes: the experiment runner is resume-safe (a job is skipped only when its
 artifacts are complete AND the recorded data/code hashes match); every
 run is deterministic per seed/fold/device; locked hyperparameters live in
 `src/registry.py` (epochs 150, patience 30, AdamW lr 1e-3, wd 1e-4,
-batch 16, dropout 0.3 for the proposal).
+batch 16, dropout 0.3 for the proposal). Runs recorded before the 2026-10-05
+`src/` restructure carry the pre-restructure `code_hash`, so the runner
+treats them as `stale` and re-runs them (identical metrics, locked seeds) to
+refresh the recorded hash.
 
 ## 8. Repository layout
 
 ```
 src/
-├── common.py, features.py, preprocess.py  # data loading, 45-feature computation, cleaning
-├── data/                                  # folds, subject matrices, leakage-safe stats, hashes
-├── trainer/                               # generic seeded trainer: epoch logs, checkpoints, bank hook
-├── proposal/                              # learned normative model + hard-deviation ablations
-├── baseline/                              # classical ML + FNN baselines
-├── metrics.py, seeding.py                 # shared metric implementation + single seeding source
-├── registry.py                            # locked SEEDS + EXP-PROP-001..005 + baselines
-├── run_experiments.py                     # experiment matrix runner (resume-safe)
-├── summarize_experiments.py               # aggregation + reports + MSNet comparison
-└── checks/                                # seed/correctness verification suite
+├── config.py            # shared paths + constants (ROOT/RAW/PROCESSED/OUTPUTS, screen, categories)
+├── rawdata.py           # raw EMS xlsx loading, subject labels, xlsx-based official folds
+├── data/                # processed-data access, metadata-based folds, subject matrices, hashes
+├── features/            # stimulus.py (45 features) + subject.py (baseline subject-level reps)
+├── models/              # proposal.py (normative model) + baselines.py (classical ML + FNN)
+├── training/            # generic seeded trainer: config, epoch logs, checkpoints, bank hook
+├── scripts/             # entry points: preprocess, train_proposal, run_baseline,
+│                        #   run_experiments (resume-safe), summarize_experiments
+├── metrics.py, seeding.py  # shared metric implementation + single seeding source + code hash
+├── registry.py          # locked SEEDS + EXP-PROP-001..005 + baselines
+└── checks/              # seed/correctness verification suite
 docs/                                      # documentation (see map below)
-roman_features/                            # isolated feature-ablation system
 outputs/experiments/                       # all run artifacts (per experiment/seed/fold)
 processed_dataset/                         # generated feature tables + metadata
 ```
@@ -243,20 +230,19 @@ The EMS dataset is **not** included in this repository (usage agreement:
 non-commercial research only). Download it from the
 [official repo](https://github.com/YingjieSong1/EMS) into
 `original_dataset/EMS/`, then regenerate `processed_dataset/` with
-`python src/preprocess.py`.
+`python src/scripts/preprocess.py`.
 
 ## 11. Documentation map
 
 | file | content |
 |---|---|
 | [`EXPERIMENTS_RESULTS.md`](EXPERIMENTS_RESULTS.md) | authoritative result tables (main vs baselines, ablations, MSNet) |
-| [`docs/README.md`](docs/README.md) | documentation index + shared protocol |
 | [`docs/features45.md`](docs/features45.md) | the 45 features: definition, formula, units, interpretation |
-| [`docs/experiments/baselines.md`](docs/experiments/baselines.md) | the 10 baselines |
-| [`docs/experiments/EXP-PROP-001.md`](docs/experiments/EXP-PROP-001.md) | main proposal methodology + results |
-| [`docs/experiments/EXP-PROP-002.md`](docs/experiments/EXP-PROP-002.md) | pooling ablation: mean |
-| [`docs/experiments/EXP-PROP-003.md`](docs/experiments/EXP-PROP-003.md) | pooling ablation: attention |
-| [`docs/experiments/EXP-PROP-004.md`](docs/experiments/EXP-PROP-004.md) | deviation ablation: hard z-deviation |
-| [`docs/experiments/EXP-PROP-005.md`](docs/experiments/EXP-PROP-005.md) | pooling ablation: max |
-| [`roman_features/README.md`](roman_features/README.md) | isolated feature-ablation system (commands, policies) |
-| [`roman_features/SUMMARY.md`](roman_features/SUMMARY.md) | feature-ablation results (10 seeds) |
+| [`docs/experiments/EXP-PROP-001.md`](docs/experiments/EXP-PROP-001.md) | main proposal — learned normative deviation + deepset pooling |
+| [`docs/experiments/ablations.md`](docs/experiments/ablations.md) | EXP-PROP-002…005 — one-component ablations (pooling, deviation) |
+| [`docs/experiments/baselines.md`](docs/experiments/baselines.md) | the 10 classical-ML / FNN baselines |
+
+Numbers in `docs/` are copied from `EXPERIMENTS_RESULTS.md` (root) and
+`outputs/experiments/reports/*.md`; the per-run artifacts live under
+`outputs/experiments/`. The executable code in `src/` is the ground truth
+whenever a formula in the docs looks ambiguous.

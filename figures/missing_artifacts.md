@@ -15,7 +15,7 @@ không có chỗ nào bịa dữ liệu để lấp chỗ trống.
   covariance vẫn được tính và lưu ở `tables/T05.01_norm_diagnostics.csv`
   như chẩn đoán không vẽ.
 - **Lệnh bổ sung** (nếu muốn đúng nguyên mẫu): train thêm một ablation
-  learned + λ_norm=0.1 (cần sửa `src/proposal/model.py` + trainer, chưa có
+  learned + λ_norm=0.1 (cần sửa `src/models/proposal.py` + `src/training/trainer.py`, chưa có
   sẵn trong code) rồi export latent như hiện tại.
 
 ## 2. SHAP / Integrated Gradients — chưa chạy
