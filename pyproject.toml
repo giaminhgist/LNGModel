@@ -1,0 +1,23 @@
+[project]
+name = "ems-projects"
+version = "0.2.0"
+description = "Normative gaze modeling for schizophrenia recognition (EMS eye-tracking dataset)"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.8.0",
+    "numpy>=2.1",
+    "pandas>=3.0",
+    "scikit-learn>=1.9",
+    "scipy>=1.15",
+    "matplotlib>=3.10",
+    "seaborn>=0.13",
+    "openpyxl>=3.1",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

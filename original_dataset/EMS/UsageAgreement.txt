@@ -1,0 +1,6 @@
+- No part of the database nor any copy thereof shall be used for commercial purposes. For the avoidance of doubt, a commercial purpose includes, but is not limited to:
+        - proving the efficiency of commercial systems,
+        - training or testing of commercial systems,
+        - using screenshots of data from the database in advertisements of any kind, including public service advertisements,
+        - selling data from the database,
+        - creating military applications.
